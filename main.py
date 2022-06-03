@@ -2,6 +2,9 @@ import pygame
 import fonts
 from pygame import mixer
 import images
+import init_screen
+
+init_screen.Init_screen()
 
 mixer.init()
 pygame.init()
@@ -125,6 +128,8 @@ create_aliens()
 
 spaceship = Spaceship(int(screen_width / 2), screen_height - 100, 3)
 spaceship_group.add(spaceship)
+
+
 
 run = True
 while run:
