@@ -1,94 +1,169 @@
 import pygame
-import init_screen
+import fonts
+from pygame import mixer
+import images
 
-init_screen.Init_screen()
+mixer.init()
+pygame.init()
 
+clock = pygame.time.Clock()
+fps = 60
 
-class Game:
-    screen = None
-    aliens = []
-    rockets = []
-    lost = False
+screen_width = 600
+screen_height = 800
 
-    def __init__(self, width, height):
-        pygame.init()
-        self.width = width
-        self.height = height
-        self.screen = pygame.display.set_mode((width, height))
-        self.clock = pygame.time.Clock()
-        done = False
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption('Space Invanders Clone')
 
-        hero = Hero(self, width / 2, height - 20)
-        generator = Generator(self)
-        rocket = None
-
-        previous_time = pygame.time.get_ticks()
-
-        while not done:
-
-            pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_LEFT]:
-                hero.x -= 2 if hero.x > 20 else 0
-            elif pressed[pygame.K_RIGHT]:
-                hero.x += 2 if hero.x < width - 20 else 0
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-                keys = pygame.key.get_pressed()
-                if keys[pygame.K_SPACE] and not self.lost:
-                    current_time = pygame.time.get_ticks()
-                    if current_time - previous_time > 600:
-                        previous_time = current_time
-                        self.rockets.append(Rocket(self, hero.x, hero.y))
-
-            pygame.display.flip()
-            self.clock.tick(60)
-            self.screen.fill((255, 255, 255))
-
-            for rocket in self.rockets:
-                rocket.draw()
-
-            if not self.lost: hero.draw()
-
-            self.displayText(str(self.clock))
-
-    def displayText(self, text):
-        pygame.font.init()
-        font = pygame.font.SysFont('Arial', 14)
-        textsurface = font.render(text, False, (0, 200, 0))
-        self.screen.blit(textsurface, (10, 5))
+i = 5
+j = 5
+last_shot = pygame.time.get_ticks()
+count = 3
+last_count = pygame.time.get_ticks()
+game_over = 0
+green = (0, 255, 0)
 
 
-class Hero:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.game = game
-        self.y = y
-
-    def draw(self):
-        pygame.draw.rect(self.game.screen,
-                         (240, 0, 255),
-                         pygame.Rect(self.x, self.y, 10, 7))
+def draw_bg():
+    screen.blit(images.bg, (0, 0))
 
 
-class Generator:
-    def __init__(self, game):
-        margin = 30
-        width = 50
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
 
 
-class Rocket:
-    def __init__(self, game, x, y):
-        self.x = x
-        self.y = y
-        self.game = game
+class Spaceship(pygame.sprite.Sprite):
+    def __init__(self, x, y, health):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = images.spaceship
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+        self.health_start = health
+        self.health_remaining = health
+        self.last_shot = pygame.time.get_ticks()
 
-    def draw(self):
-        pygame.draw.rect(self.game.screen, (0, 0, 0), pygame.Rect(self.x, self.y, 4, 6))
-        self.y -= 2
+    def update(self):
+
+        speed = 8
+        cd = 600
+        game_over = 0
+
+        key = pygame.key.get_pressed()
+        if key[pygame.K_a] and self.rect.left > 0:
+            self.rect.x -= speed
+        if key[pygame.K_d] and self.rect.right < screen_width:
+            self.rect.x += speed
+
+        time_now = pygame.time.get_ticks()
+
+        if key[pygame.K_SPACE] and time_now - self.last_shot > cd:
+            bullet = Bullets(self.rect.centerx, self.rect.top)
+            bullet_group.add(bullet)
+            self.last_shot = time_now
+
+        self.mask = pygame.mask.from_surface(self.image)
+        if self.health_remaining <= 0:
+            self.kill()
+            game_over = -1
+        return game_over
 
 
-if __name__ == '__main__':
-    game = Game(600, 400)
+class Bullets(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = images.bullet
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
 
+    def update(self):
+        self.rect.y -= 5
+        if self.rect.bottom < 0:
+            self.kill()
+        if pygame.sprite.spritecollide(self, alien_group, True):
+            self.kill()
+
+
+class Aliens(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = images.alien
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+        self.move_counter = 0
+        self.move_x = 1
+        self.move_y = 1
+
+    def update(self):
+
+        self.rect.x += self.move_x
+        self.move_counter += 1
+        if abs(self.move_counter) > 75:
+            self.rect.y += 15
+            self.move_x *= -1
+            self.move_counter *= self.move_x
+
+        if self.rect == spaceship.rect:
+            spaceship.health_remaining -= 1
+
+
+spaceship_group = pygame.sprite.Group()
+bullet_group = pygame.sprite.Group()
+alien_group = pygame.sprite.Group()
+alien_bullet_group = pygame.sprite.Group()
+explosion_group = pygame.sprite.Group()
+
+
+def create_aliens():
+    for row in range(i):
+        for item in range(j):
+            alien = Aliens(100 + item * 100, 100 + row * 70)
+            alien_group.add(alien)
+
+
+create_aliens()
+
+spaceship = Spaceship(int(screen_width / 2), screen_height - 100, 3)
+spaceship_group.add(spaceship)
+
+run = True
+while run:
+
+    clock.tick(fps)
+
+    draw_bg()
+
+    if count == 0:
+
+        if len(alien_group) == 0:
+            game_over = 1
+
+        if game_over == 0:
+            spaceship.update()
+            bullet_group.update()
+            alien_group.update()
+            alien_bullet_group.update()
+
+    if count > 0:
+        count_timer = pygame.time.get_ticks()
+        if count_timer - last_count > 100:
+            count -= 1
+            last_count = count_timer
+
+    explosion_group.update()
+
+    spaceship_group.draw(screen)
+    bullet_group.draw(screen)
+    alien_group.draw(screen)
+    alien_bullet_group.draw(screen)
+    explosion_group.draw(screen)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    fonts.draw_text(str(clock), fonts.fontfinal, green, 20, 30)
+
+    pygame.display.update()
+
+pygame.quit()
