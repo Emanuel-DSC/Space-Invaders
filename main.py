@@ -25,6 +25,7 @@ count = 3
 last_count = pygame.time.get_ticks()
 game_over = 0
 green = (0, 255, 0)
+white = (255, 255, 255)
 
 
 def draw_bg():
@@ -49,7 +50,7 @@ class Spaceship(pygame.sprite.Sprite):
     def update(self):
 
         speed = 8
-        cd = 600
+        cd = 300
         game_over = 0
 
         key = pygame.key.get_pressed()
@@ -73,6 +74,8 @@ class Spaceship(pygame.sprite.Sprite):
 
 
 class Bullets(pygame.sprite.Sprite):
+    score = 0
+
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = images.bullet
@@ -85,6 +88,7 @@ class Bullets(pygame.sprite.Sprite):
             self.kill()
         if pygame.sprite.spritecollide(self, alien_group, True):
             self.kill()
+            Bullets.score += 50
 
 
 class Aliens(pygame.sprite.Sprite):
@@ -130,7 +134,6 @@ spaceship = Spaceship(int(screen_width / 2), screen_height - 100, 3)
 spaceship_group.add(spaceship)
 
 
-
 run = True
 while run:
 
@@ -142,6 +145,10 @@ while run:
 
         if len(alien_group) == 0:
             game_over = 1
+            spaceship.update()
+            bullet_group.update()
+            alien_group.update()
+            alien_bullet_group.update()
 
         if game_over == 0:
             spaceship.update()
@@ -168,6 +175,7 @@ while run:
             run = False
 
     fonts.draw_text(str(clock), fonts.fontfinal, green, 20, 30)
+    fonts.draw_text('PONTOS:' + str(Bullets.score), fonts.fontfinal, white, 500, 30)
 
     pygame.display.update()
 

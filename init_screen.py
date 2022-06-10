@@ -8,12 +8,12 @@ from time import sleep
 BLACK = (0, 0, 0)
 
 SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 400
+SCREEN_HEIGHT = 700
 
-b1_left, b1_top, b1_width, b1_height = 60, 300, 100, 50
-b2_left, b2_top, b2_width, b2_height = 190, 300, 100, 50
-b3_left, b3_top, b3_width, b3_height = 315, 300, 100, 50
-b4_left, b4_top, b4_width, b4_height = 445, 300, 100, 50
+b1_left, b1_top, b1_width, b1_height = 60, 600, 100, 50
+b2_left, b2_top, b2_width, b2_height = 190, 600, 100, 50
+b3_left, b3_top, b3_width, b3_height = 315, 600, 100, 50
+b4_left, b4_top, b4_width, b4_height = 445, 600, 100, 50
 
 clock = pygame.time.Clock()
 
