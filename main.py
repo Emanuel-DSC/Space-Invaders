@@ -22,7 +22,7 @@ pygame.display.set_caption('Space Invanders Clone')
 
 i = 5
 j = 5
-alien_shot_cooldown = random.randint(700, 1000)
+alien_shot_cooldown = 1000
 last_alien_shot = pygame.time.get_ticks()
 last_shot = pygame.time.get_ticks()
 count = 3
@@ -106,6 +106,8 @@ class Bullets(pygame.sprite.Sprite):
 
 
 class Aliens(pygame.sprite.Sprite):
+    move_speed = 10
+
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = images.alien
@@ -120,8 +122,8 @@ class Aliens(pygame.sprite.Sprite):
         self.rect.x += self.move_x
         self.move_counter += 1
         if abs(self.move_counter) > 75:
-            self.rect.y += 15
             self.move_x *= -1
+            self.rect.y += Aliens.move_speed
             self.move_counter *= self.move_x
 
         if self.rect == spaceship.rect:
@@ -151,7 +153,6 @@ spaceship_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 alien_group = pygame.sprite.Group()
 alien_bullet_group = pygame.sprite.Group()
-explosion_group = pygame.sprite.Group()
 
 
 def create_aliens():
@@ -185,7 +186,9 @@ while run:
             last_alien_shot = actuall_time
 
         if len(alien_group) == 0:
-            game_over = 1
+            create_aliens()
+            Aliens.move_speed += 4
+            alien_shot_cooldown -= 100
             spaceship.update()
             bullet_group.update()
             alien_group.update()
@@ -202,9 +205,6 @@ while run:
                                                                                                    + 100))
                 sleep(2)
                 init_screen.Init_screen()
-            if game_over == 1:
-                fonts.draw_text('VITÓRIA', fonts.fontfinal_grande, green, (screen_width / 2 - 180), (screen_height / 2
-                                                                                                     + 100))
 
     if count > 0:
         count_timer = pygame.time.get_ticks()
