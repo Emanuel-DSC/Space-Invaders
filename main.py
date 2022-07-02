@@ -1,10 +1,10 @@
-import pygame
+import pygame, sys
 import random
 import fonts
 from pygame import mixer
 import images
+import ranking_page
 import init_screen
-from time import sleep
 
 init_screen.Init_screen()
 
@@ -20,6 +20,7 @@ screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Space Invanders Clone')
 
+user_text = ''
 i = 5
 j = 5
 alien_shot_cooldown = 1000
@@ -199,12 +200,6 @@ while run:
             bullet_group.update()
             alien_group.update()
             alien_bullet_group.update()
-        else:
-            if game_over == -1:
-                fonts.draw_text('DERROTA', fonts.fontfinal_grande, red, (screen_width / 2 - 180), (screen_height / 2
-                                                                                                   + 100))
-                sleep(2)
-                init_screen.Init_screen()
 
     if count > 0:
         count_timer = pygame.time.get_ticks()
@@ -217,9 +212,40 @@ while run:
     alien_group.draw(screen)
     alien_bullet_group.draw(screen)
 
+    if spaceship.lives_remaining <= 0:
+        # som derrota
+        spaceship_group.empty()
+        bullet_group.empty()
+        alien_group.empty()
+        alien_bullet_group.empty()
+        draw_bg()
+        fonts.draw_text('PONTOS:\n' + str(Bullets.score), fonts.fontfinal_grande, white, screen_width / 2 - 200,
+                        screen_height/2 - 300)
+        fonts.draw_text('DIGITE SEU NOME:\n', fonts.fontfinal_grande, white, screen_width/2 - 200, screen_height/2 - 200)
+        fonts.draw_text('APERTE ENTER', fonts.fontfinal_grande, white, 100, 600)
+        fonts.draw_text('PARA CONCLUIR', fonts.fontfinal_grande, white, 100, 700)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
+            pygame.quit()
+            sys.exit()
+
+            # ONDE TIVE MAIOR DIFICULDADE
+            # Se a vida for menor ouu igual a 0, captura o texto do jogador (nome) , caso aperte ENTER , salva o nome
+            # e o placar. Depois encerra o loop e abre a pagina de ranking
+        if spaceship.lives_remaining <= 0:
+            if event.type == pygame.KEYDOWN:
+                user_text += event.unicode
+            key = pygame.key.get_pressed()
+            if key[pygame.K_RETURN]:
+                with open('high_score.txt', 'a') as file:
+                    file.write(f"{user_text}: {Bullets.score}\n")
+                run = False
+                ranking_page.Ranking_page()
+
+    fonts.draw_text(user_text, fonts.fontfinal_grande, green, screen_width/2 - 50, screen_height/2 - 100)
+
+    # fonts.draw_text(user_text, fonts.fontfinal, red, 220, 230)
 
     fonts.draw_text(str(clock), fonts.fontfinal, green, 20, 30)
     fonts.draw_text('PONTOS:' + str(Bullets.score), fonts.fontfinal, white, 500, 30)
