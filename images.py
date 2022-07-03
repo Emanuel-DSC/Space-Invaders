@@ -1,6 +1,7 @@
 import pygame
 
 bg_menu_image = pygame.image.load('assets/images/menu_bg.jpg')
+ranking_bg = pygame.image.load('assets/images/ranking_bg.jpg')
 bg_dificuldade_image = pygame.image.load('assets/images/dificuldade_menu.png')
 iniciar_on = pygame.image.load('assets/images/iniciar_on.png')
 iniciar_off = pygame.image.load('assets/images/iniciar_off.png')

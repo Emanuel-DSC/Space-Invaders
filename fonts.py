@@ -6,6 +6,7 @@ SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 fontfinal = pygame.font.Font('Reboot.ttf', 15)
+fontfinal_media = pygame.font.Font('Reboot.ttf', 30)
 fontfinal_grande = pygame.font.Font('Reboot.ttf', 60)
 
 

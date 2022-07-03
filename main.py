@@ -20,6 +20,7 @@ screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Space Invanders Clone')
 
+list = []
 user_text = ''
 i = 5
 j = 5
@@ -75,7 +76,6 @@ class Spaceship(pygame.sprite.Sprite):
         actual_time = pygame.time.get_ticks()
 
         if key[pygame.K_SPACE] and actual_time - self.last_shot > cd:
-            #add som de tiro
             bullet = Bullets(self.rect.centerx, self.rect.top)
             bullet_group.add(bullet)
             self.last_shot = actual_time
@@ -219,9 +219,10 @@ while run:
         alien_group.empty()
         alien_bullet_group.empty()
         draw_bg()
-        fonts.draw_text('PONTOS:\n' + str(Bullets.score), fonts.fontfinal_grande, white, screen_width / 2 - 200,
+        fonts.draw_text('PONTOS:\n' + str(Bullets.score), fonts.fontfinal_grande, white, screen_width / 2 - 300,
                         screen_height/2 - 300)
-        fonts.draw_text('DIGITE SEU NOME:\n', fonts.fontfinal_grande, white, screen_width/2 - 200, screen_height/2 - 200)
+        fonts.draw_text('DIGITE SEU NOME:\n', fonts.fontfinal_grande, white, screen_width/2 - 300,
+                        screen_height/2 - 200)
         fonts.draw_text('APERTE ENTER', fonts.fontfinal_grande, white, 100, 600)
         fonts.draw_text('PARA CONCLUIR', fonts.fontfinal_grande, white, 100, 700)
 
@@ -234,16 +235,17 @@ while run:
             # Se a vida for menor ouu igual a 0, captura o texto do jogador (nome) , caso aperte ENTER , salva o nome
             # e o placar. Depois encerra o loop e abre a pagina de ranking
         if spaceship.lives_remaining <= 0:
-            if event.type == pygame.KEYDOWN:
-                user_text += event.unicode
             key = pygame.key.get_pressed()
             if key[pygame.K_RETURN]:
                 with open('high_score.txt', 'a') as file:
                     file.write(f"{user_text}: {Bullets.score}\n")
                 run = False
                 ranking_page.Ranking_page()
+            if event.type == pygame.KEYDOWN:
+                user_text += event.unicode
+            key = pygame.key.get_pressed()
 
-    fonts.draw_text(user_text, fonts.fontfinal_grande, green, screen_width/2 - 50, screen_height/2 - 100)
+    fonts.draw_text(user_text, fonts.fontfinal_grande, green, screen_width/2 - 50, screen_height/2 - 150)
 
     # fonts.draw_text(user_text, fonts.fontfinal, red, 220, 230)
 

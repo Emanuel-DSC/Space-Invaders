@@ -1,1 +1,9 @@
-TESTE: 50
+jose: 100
+antonia: 50
+antonia: 350
+marina: 400
+andre: 150
+pedro: 750
+augusto: 950
+brenda: 650
+emanuel: 700
