@@ -213,6 +213,7 @@ while run:
             create_aliens()
             Aliens.move_speed += 4
             alien_shot_cooldown -= 100
+            Bullets.boss_lives = 3
             spaceship.update()
             bullet_group.update()
             boss_group.update()
