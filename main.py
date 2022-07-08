@@ -90,6 +90,7 @@ class Spaceship(pygame.sprite.Sprite):
 
 class Bullets(pygame.sprite.Sprite):
     score = 0
+    boss_lives = 3
 
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -98,12 +99,22 @@ class Bullets(pygame.sprite.Sprite):
         self.rect.center = [x, y]
 
     def update(self):
+
         self.rect.y -= 5
         if self.rect.bottom < 0:
             self.kill()
+
         if pygame.sprite.spritecollide(self, alien_group, True):
             self.kill()
             Bullets.score += 50
+
+        if pygame.sprite.spritecollide(self, boss_group, False):
+            self.kill()
+            Bullets.boss_lives -= 1
+            print(Bullets.boss_lives)
+
+        if Bullets.boss_lives == 0:
+            pygame.sprite.spritecollide(self, boss_group, True)
 
 
 class Aliens(pygame.sprite.Sprite):
@@ -153,17 +164,29 @@ class Alien_Bullets(pygame.sprite.Sprite):
 spaceship_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 alien_group = pygame.sprite.Group()
+boss_group = pygame.sprite.Group()
 alien_bullet_group = pygame.sprite.Group()
 
 
 def create_aliens():
+    list_alien = []
     for row in range(i):
         for item in range(j):
             alien = Aliens(100 + item * 100, 100 + row * 70)
+
+            # cria a lista de aliens
+            list_alien.append(alien)
             alien_group.add(alien)
+
+    # aleatoriamente seleciona um alien , o remove do grupo aliens e poe como boss
+    boss = random.choice(list_alien)
+    alien_group.remove(boss)
+    boss_group.add(boss)
+    boss.image = images.boss
 
 
 create_aliens()
+
 
 spaceship = Spaceship(int(screen_width / 2), screen_height - 100, 3)
 spaceship_group.add(spaceship)
@@ -186,12 +209,13 @@ while run:
             alien_bullet_group.add(alien_bullet)
             last_alien_shot = actuall_time
 
-        if len(alien_group) == 0:
+        if len(alien_group) == 0 and len(boss_group) == 0:
             create_aliens()
             Aliens.move_speed += 4
             alien_shot_cooldown -= 100
             spaceship.update()
             bullet_group.update()
+            boss_group.update()
             alien_group.update()
             alien_bullet_group.update()
 
@@ -199,6 +223,7 @@ while run:
             game_over = spaceship.update()
             bullet_group.update()
             alien_group.update()
+            boss_group.update()
             alien_bullet_group.update()
 
     if count > 0:
@@ -211,6 +236,7 @@ while run:
     bullet_group.draw(screen)
     alien_group.draw(screen)
     alien_bullet_group.draw(screen)
+    boss_group.draw(screen)
 
     if spaceship.lives_remaining <= 0:
         # som derrota
