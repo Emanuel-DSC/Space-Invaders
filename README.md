@@ -1,2 +1,2 @@
 # Space-Invaders
-College's project - Game programming 
+2021 College's project - Game programming 
