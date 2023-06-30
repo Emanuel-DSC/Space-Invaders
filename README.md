@@ -1,4 +1,4 @@
-# Space-Invaders - 2021 College's project 
+# Space-Invaders - 2022 College's project 
 
 I had to code this level of space invaders in my Game Lab (Python) course.
 
